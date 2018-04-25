@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "standard --fix && standard-markdown --fix",
+    "test-debug": "node --inspect-brk $(npm bin)/jest -i",
     "test": "jest",
     "posttest": "npm run-script lint"
   },
