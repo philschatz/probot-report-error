@@ -1,0 +1,23 @@
+{
+  "name": "probot-report-error",
+  "version": "1.0.0",
+  "description": "Utility for reporting errors by creating an Issue",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard --fix && standard-markdown --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phischatz/probot-report-error.git"
+  },
+  "author": "philschatz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/phischatz/probot-report-error/issues"
+  },
+  "homepage": "https://github.com/phischatz/probot-report-error#readme",
+  "devDependencies": {
+    "standard": "^11.0.1",
+    "standard-markdown": "^4.0.2"
+  }
+}
