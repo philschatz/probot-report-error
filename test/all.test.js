@@ -5,7 +5,7 @@ const fetch = require('fetch-vcr')
 const Context = require('probot/lib/context')
 const Octokit = require('@octokit/rest')
 
-const reportIssue = require('../lib/report-issue')
+const {reportIssue, getConfigOrReportError} = require('../')
 
 // This sets the fixture, runs the commands, and then verifies that each file
 // in the directory was loaded exactly once.
@@ -15,14 +15,18 @@ async function usingFixture (name, fn) {
   fetch.configure({
     fixturePath: fixturePath
   })
-  const ret = await fn()
-  const apiCalls = fetch.getCalled()
-  const calledFiles = apiCalls
-    .map(({bodyFilename}) => bodyFilename)
-    .concat(apiCalls.map(({optionsFilename}) => optionsFilename))
-  const allFiles = readdirSync(fixturePath)
-  expect(calledFiles.sort()).toEqual(allFiles.sort())
-  return ret
+  try {
+    return await fn()
+  } catch (err) {
+    throw err
+  } finally {
+    const apiCalls = fetch.getCalled()
+    const calledFiles = apiCalls
+      .map(({bodyFilename}) => bodyFilename)
+      .concat(apiCalls.map(({optionsFilename}) => optionsFilename))
+    const allFiles = readdirSync(fixturePath)
+    expect(calledFiles.sort()).toEqual(allFiles.sort())
+  }
 }
 
 describe('Report Issue', () => {
@@ -85,5 +89,32 @@ describe('Report Issue', () => {
         body: 'ReportIssue Body'
       })
     )
+  })
+
+  it('Creates an Issue when there is an invalid YAML file', async () => {
+    const promise = usingFixture('invalid-yaml', () =>
+      getConfigOrReportError(context, 'stale.yml', (err) => {
+        return {
+          title: 'Error while checking for stale issues',
+          body: `An error occurred while trying to check this repository for stale issues.
+\`\`\`
+${err.message}
+\`\`\`
+
+Check the syntax of \`.github/stale.yml\` and make sure it's valid. For more information or questions, see [probot/stale](https://github.com/probot/stale)
+`
+        }
+      })
+    )
+
+    // Fail if there was no error.
+    // Succeed if all the expected API calls were made and we received a YAMLException
+    promise.then(() => expect(false).toBeTruthy(), (err) => {
+      // Verify that the error is correct
+      expect(err.name).toEqual('YAMLException')
+      expect(err.message).toEqual(`incomplete explicit mapping pair; a key node is missed; or followed by a non-tabulated empty line at line 1, column 17:
+    stale: [invalid]: yaml
+                    ^`)
+    })
   })
 })

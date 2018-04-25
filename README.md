@@ -1,4 +1,73 @@
-# Design
+# probot-report-error
+
+This library allows [probot](https://github.com/probot/probot) bots to report an error by creating an Issue on the affected repository. If an Issue with the same title exists but is closed, it will be reopened.
+
+# Usage
+
+There are two ways to use this library:
+
+- Report an Error when the config file cannot be parsed
+- Report an Error at any point
+
+### Report an Error when the config file cannot be parsed
+
+Instead of writing `config = await context.config('config.yml')`,
+run `config = await getConfigOrReportError(context, 'config.yml', messageFn)`
+where `messageFn` is a function that takes the `Error` that occurred and returns
+a `{title, body}` object which contains the text that will be used for the Issue
+title and body.
+
+**Example:**
+
+```js
+const {getConfigOrReportError} = require('probot-report-error')
+
+robot.on('push', async (context) => {
+
+  // Replace context.config('config.yml') with the following:
+  const config = await getConfigOrReportError(context, 'config.yml', (err) => {
+    // This is the handler that generates the message which is used when creating the Issue
+    return {
+      title: 'The Configuration file for barista-bot is invalid',
+      body: `An error occurred while trying to read the configuration for barista-bot.
+\`\`\`
+${err.message}
+\`\`\`
+
+Check the syntax of \`.github/config.yml\` and make sure it's valid. For more information or questions, see [philschatz/barista-bot](https://github.com/philschatz/barista-bot)
+`
+    }
+  })
+})
+```
+
+
+### Report an Error at any point
+
+Not all errors occur while parsing the YAML file. To report any errors `reportIssue` can be used.
+
+**Example:**
+
+```js
+const {reportIssue} = require('probot-report-error')
+
+robot.on('push', async (context) => {
+  // ...
+  if (!coffeeShop) {
+    await reportIssue(context, {
+      title: 'Barista-bot validation failed',
+      body: 'Missing coffeeShop preference in config.yml file'
+    })
+  }
+})
+```
+
+
+---
+
+(these are notes from building this package)
+
+# Design Notes
 
 ## Initialization Options
 
