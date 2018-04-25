@@ -4,7 +4,9 @@
   "description": "Utility for reporting errors by creating an Issue",
   "main": "index.js",
   "scripts": {
-    "test": "standard --fix && standard-markdown --fix"
+    "lint": "standard --fix && standard-markdown --fix",
+    "test": "jest",
+    "posttest": "npm run-script lint"
   },
   "repository": {
     "type": "git",
@@ -16,7 +18,14 @@
     "url": "https://github.com/phischatz/probot-report-error/issues"
   },
   "homepage": "https://github.com/phischatz/probot-report-error#readme",
+  "standard": {
+    "env": "jest"
+  },
   "devDependencies": {
+    "dotenv": "^5.0.1",
+    "fetch-vcr": "^2.1.0",
+    "jest": "^22.4.3",
+    "probot": "^6.1.0",
     "standard": "^11.0.1",
     "standard-markdown": "^4.0.2"
   }

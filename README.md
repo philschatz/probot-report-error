@@ -81,3 +81,9 @@ async function reportIssue (context, {title, body}) {
   }
 }
 ```
+
+
+# Challenges
+
+- there is no good way to filter Issues by title (so I used `github.search.issue(...)`)
+- probot lacks a quick way to record API requests (so I added `fetch-vcr`)
