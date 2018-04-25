@@ -1,4 +1,5 @@
 require('dotenv').config()
+const {readdirSync} = require('fs')
 const {join: pathJoin} = require('path')
 const fetch = require('fetch-vcr')
 const Context = require('probot/lib/context')
@@ -6,13 +7,25 @@ const Octokit = require('@octokit/rest')
 
 const reportIssue = require('../lib/report-issue')
 
-function useFixture (name) {
+// This sets the fixture, runs the commands, and then verifies that each file
+// in the directory was loaded exactly once.
+async function usingFixture (name, fn) {
+  const fixturePath = pathJoin(__dirname, '_fixtures', name)
+  fetch.clearCalled()
   fetch.configure({
-    fixturePath: pathJoin(__dirname, '_fixtures', name)
+    fixturePath: fixturePath
   })
+  const ret = await fn()
+  const apiCalls = fetch.getCalled()
+  const calledFiles = apiCalls
+    .map(({bodyFilename}) => bodyFilename)
+    .concat(apiCalls.map(({optionsFilename}) => optionsFilename))
+  const allFiles = readdirSync(fixturePath)
+  expect(calledFiles.sort()).toEqual(allFiles.sort())
+  return ret
 }
 
-describe('Sanity check', () => {
+describe('Report Issue', () => {
   let context
 
   beforeEach(() => {
@@ -42,31 +55,35 @@ describe('Sanity check', () => {
   })
 
   it('Can get a single repository (sanity check)', async () => {
-    useFixture('sanity-check')
-    return context.github.repos.get(context.repo())
+    return usingFixture('sanity-check', () =>
+      context.github.repos.get(context.repo())
+    )
   })
 
   it('Can create a new Issue when one does not exist yet', async () => {
-    useFixture('fresh-issue')
-    return reportIssue(context, {
-      title: 'ReportIssue Title',
-      body: 'ReportIssue Body'
-    })
+    return usingFixture('fresh-issue', () =>
+      reportIssue(context, {
+        title: 'ReportIssue Title',
+        body: 'ReportIssue Body'
+      })
+    )
   })
 
   it('Does not create a new Issue when one is already open', async () => {
-    useFixture('already-open-issue')
-    return reportIssue(context, {
-      title: 'ReportIssue Title',
-      body: 'ReportIssue Body'
-    })
+    return usingFixture('already-open-issue', () =>
+      reportIssue(context, {
+        title: 'ReportIssue Title',
+        body: 'ReportIssue Body'
+      })
+    )
   })
 
   it('Reopens an Issue when one is closed', async () => {
-    useFixture('already-closed-issue')
-    return reportIssue(context, {
-      title: 'ReportIssue Title',
-      body: 'ReportIssue Body'
-    })
+    return usingFixture('already-closed-issue', () =>
+      reportIssue(context, {
+        title: 'ReportIssue Title',
+        body: 'ReportIssue Body'
+      })
+    )
   })
 })
