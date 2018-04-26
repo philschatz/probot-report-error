@@ -29,6 +29,11 @@ async function usingFixture (name, fn) {
   }
 }
 
+// Just causes the test to fail. TODO: Find a nicer way to do this
+function fail () {
+  expect(false).toBeTruthy()
+}
+
 describe('Report Issue', () => {
   let context
 
@@ -109,12 +114,26 @@ Check the syntax of \`.github/stale.yml\` and make sure it's valid. For more inf
 
     // Fail if there was no error.
     // Succeed if all the expected API calls were made and we received a YAMLException
-    promise.then(() => expect(false).toBeTruthy(), (err) => {
+    promise.then(() => fail, (err) => {
       // Verify that the error is correct
       expect(err.name).toEqual('YAMLException')
       expect(err.message).toEqual(`incomplete explicit mapping pair; a key node is missed; or followed by a non-tabulated empty line at line 1, column 17:
     stale: [invalid]: yaml
                     ^`)
     })
+  })
+
+  it('Validates the input', async () => {
+    async function callWithArgs (args, expectedErrorMessage) {
+      await reportIssue(context, args)
+        .then(fail)
+        .catch(err => expect(err.message).toEqual(expectedErrorMessage))
+    }
+
+    await callWithArgs(undefined, "Cannot destructure property `title` of 'undefined' or 'null'.")
+    await callWithArgs({}, 'BUG: Empty title when reporting an Issue')
+    await callWithArgs({title: ''}, 'BUG: Empty title when reporting an Issue')
+    await callWithArgs({title: 't'}, 'BUG: Empty body when reporting an Issue')
+    await callWithArgs({title: 't', body: ''}, 'BUG: Empty body when reporting an Issue')
   })
 })

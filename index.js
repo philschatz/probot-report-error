@@ -1,4 +1,13 @@
 async function reportIssue (context, {title, body}) {
+  // Validate the input
+  // TODO: Decide whether to validate that the title and body are strings and are not too short
+  if (!title) {
+    throw new Error('BUG: Empty title when reporting an Issue')
+  }
+  if (!body) {
+    throw new Error('BUG: Empty body when reporting an Issue')
+  }
+
   // Search for all Issues in the repo that match the title
   const {owner: repoOwner, repo: repoName} = context.repo()
   const query = `repo:${repoOwner}/${repoName} type:issue in:title ${title}`

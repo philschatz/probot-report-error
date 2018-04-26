@@ -65,17 +65,23 @@ robot.on('push', async (context) => {
 ```
 
 
+# Development
+
+To run the tests with a debugger, run `npm run-script test-debug`. Make sure you add a `debugger` statement in the code.
+
+To re-record the fixtures, see [./test/_fixtures/README.md](./test/_fixtures/README.md)
+
 ---
 
 # TODO
 
-- [x] [notes.md](design) what the API looks like
+- [x] [design](./notes.md) what the API looks like
 - [x] add test framework and sanity test
 - [x] add `reportIssue` (with tests)
 - [x] add `getConfigOrReportError` (with tests)
 - [x] write documentation
 - [x] move design notes into a separate md file
-- [ ] validate input
+- [x] validate input
 - [ ] add travis and codecov
 - [ ] test with an examplebot
 - [ ] clean up the design notes

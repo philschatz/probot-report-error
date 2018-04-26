@@ -91,4 +91,6 @@ async function reportIssue (context, {title, body}) {
 
 - there is no good way to filter Issues by title (so I used `github.search.issue(...)`)
 - probot lacks a _quick_ way to record API requests (so I added [fetch-vcr](https://github.com/philschatz/fetch-vcr) for expediency)
+- debugging a bot is not described well so I added `npm run test-debug`
 - it was unclear what should happen when an Issue already exists. Should a new comment be added denoting that the error occurred, or should the body of the Issue be updated with the new message?
+- cannot use Jest's `expect(fn).toThrow(message)` because of async functions. Need to use `promise.catch(err => ...)` and then compare errors manually. Maybe there is a better way?
