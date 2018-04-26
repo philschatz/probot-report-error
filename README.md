@@ -79,3 +79,4 @@ robot.on('push', async (context) => {
 - [ ] add travis and codecov
 - [ ] test with an examplebot
 - [ ] clean up the design notes
+- [ ] switch to TypeScript
