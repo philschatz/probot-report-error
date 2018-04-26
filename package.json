@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "standard --fix && standard-markdown --fix",
     "test-debug": "node --inspect-brk $(npm bin)/jest -i",
-    "test": "jest",
+    "test": "jest --coverage",
     "posttest": "npm run-script lint"
   },
   "repository": {
