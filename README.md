@@ -82,7 +82,8 @@ To re-record the fixtures, see [./test/_fixtures/README.md](./test/_fixtures/REA
 - [x] write documentation
 - [x] move design notes into a separate md file
 - [x] validate input
-- [ ] add travis and codecov
+- [x] add travis and codecov
+- [ ] add greenkeeper
 - [ ] test with an examplebot
 - [ ] clean up the design notes
 - [ ] switch to TypeScript
