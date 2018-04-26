@@ -9,8 +9,10 @@ Just brainstorming methods for calling this library.
 - [x] pass the context as an arg: `require('probot-report-error').reportIssue(context, {title, body})`
 - [ ] allow a way to either wrap code in a `try { } catch (err)` or listen to promise.reject
 - [ ] support wrapping the config retrieval. Something like `await reporter.getConfigOrReportError(context, filename, (err) => {title, body})`
-- Show examples using robot.config() as well as `probot-config` 's `getConfig()` (which parses the file)
 - [ ] attach a method on probot : `require('probot-report-error')(robot); robot.reportIssue(context, {title, body})`
+    - or, attach a method on the context: `context.reportIssue({title, body})`
+- Show examples using `context.config(...)` as well as [`probot-config`](https://github.com/getsentry/probot-config) 's `getConfig()` (which parses the file)
+
 
 ## Workflow
 
@@ -48,16 +50,19 @@ Check the syntax of `.github / stale.yml` and make sure it's valid. For more inf
 
 #### Notes
 
-Look at https://github.com/behaviorbot/new-issue-welcome/blob/master/index.js for searching through Issues.
-
-https://developer.github.com/v3/issues/#list-issues-for-a-repository does not let you filter by title. So we need https://developer.github.com/v3/search/#search-issues . To limit to the repository: https://help.github.com/articles/searching-issues-and-pull-requests/#search-within-a-users-or-organizations-repositories
+- Look at [behaviorbot/new-issue-welcome](https://github.com/behaviorbot/new-issue-welcome/blob/master/index.js) for searching through Issues.
+    - it uses [list-issues-for-a-repository](https://developer.github.com/v3/issues/#list-issues-for-a-repository) which allows filtering by label or author but not by title
+    - Instead, we need to use the [Search Issues API](https://developer.github.com/v3/search/#search-issues)
+    - To limit to the repository we need this querystring: [`repo:owner/name`](https://help.github.com/articles/searching-issues-and-pull-requests/#search-within-a-users-or-organizations-repositories)
 
 May need to cache this information because searches have a lower rate limit.
 
-Another approach could be to add a label to the Issue... then we filter on the label. but that is out-of-scope for now.
+Another approach could be to add a label to the Issue... then we filter on the label. But that is out-of-scope for now.
 
 
 ## Pseudocode
+
+Just jotted down some initial pseudocode for implementing the feature:
 
 ```js
 async function reportIssue (context, {title, body}) {
@@ -89,8 +94,8 @@ async function reportIssue (context, {title, body}) {
 
 # Challenges/Friction
 
-- there is no good way to filter Issues by title (so I used `github.search.issue(...)`)
-- probot lacks a _quick_ way to record API requests (so I added [fetch-vcr](https://github.com/philschatz/fetch-vcr) for expediency)
+- there is no good way in the API to filter Issues by title (so I used `github.search.issue(...)`)
+- probot lacks an _easy_ way to record API requests (so I added [fetch-vcr](https://github.com/philschatz/fetch-vcr) for expediency)
 - debugging a bot is not described well so I added `npm run test-debug`
 - it was unclear what should happen when an Issue already exists. Should a new comment be added denoting that the error occurred, or should the body of the Issue be updated with the new message?
 - cannot use Jest's `expect(fn).toThrow(message)` because of async functions. Need to use `promise.catch(err => ...)` and then compare errors manually. Maybe there is a better way?
