@@ -42,7 +42,7 @@ describe('Report Issue', () => {
     // The payload is just enough for `context.repo()` to work.
     // Also, use the GitHub token in case we are recording the fixtures.
     const github = new Octokit()
-    const log = undefined
+    const log = { debug: () => null }
     const event = {
       payload: {
         repository: {

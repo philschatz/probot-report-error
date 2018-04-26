@@ -21,15 +21,18 @@ async function reportIssue (context, {title, body}) {
     // TODO: Discuss whether to just check if the issue is closed (and reopen it)
     switch (issue.state) {
       case 'open':
+        context.log.debug(`Issue in ${repoOwner}/${repoName} with title "${title}" is already open`)
         break
       case 'closed':
         // Reopen the Issue (TODO: add a comment)
+        context.log.debug(`Reopening issue in ${repoOwner}/${repoName}#${issue.number}`)
         return context.github.issues.edit(context.repo({number: issue.number, state: 'open', body}))
       default:
         throw new Error(`BUG: Invalid Issue state '${issue.state}'`)
     }
   } else {
     // Create a new Issue
+    context.log.debug(`Creating new issue in ${repoOwner}/${repoName} with title "${title}"`)
     return context.github.issues.create(context.repo({ title, body }))
   }
 }
