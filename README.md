@@ -1,5 +1,7 @@
 # probot-report-error
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/philschatz/probot-report-error.svg)](https://greenkeeper.io/)
+
 This library allows [probot](https://github.com/probot/probot) bots to report an error by creating an Issue on the affected repository. If an Issue with the same title exists but is closed, it will be reopened.
 
 See the TODO section below and the [design notes](./notes.md) for notes and challenges implementing this bot.
