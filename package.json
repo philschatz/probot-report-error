@@ -23,7 +23,7 @@
     "env": "jest"
   },
   "devDependencies": {
-    "dotenv": "^5.0.1",
+    "dotenv": "^7.0.0",
     "fetch-vcr": "^2.2.0",
     "jest": "^22.4.3",
     "probot": "^6.1.0",
