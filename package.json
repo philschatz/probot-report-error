@@ -28,6 +28,6 @@
     "jest": "^22.4.3",
     "probot": "^6.1.0",
     "standard": "^11.0.1",
-    "standard-markdown": "^4.0.2"
+    "standard-markdown": "^5.1.0"
   }
 }
